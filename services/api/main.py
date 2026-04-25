@@ -14,7 +14,9 @@ from typing import Optional
 
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Depends, Query, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.responses import StreamingResponse, JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+import os
 from sqlalchemy.orm import Session
 
 import google.generativeai as genai
@@ -610,6 +612,23 @@ async def simulate_detection_agents(db: Session = Depends(get_db)):
         "detections_created": len(detections_created),
         "detections": detections_created,
     }
+
+
+# ---------------------------------------------------------------------------
+# Static Web Bundle Resolution (Docker / Render)
+# ---------------------------------------------------------------------------
+dist_dir = os.path.join(os.path.dirname(__file__), "../../../frontend/dist")
+if os.path.isdir(dist_dir):
+    app.mount("/assets", StaticFiles(directory=os.path.join(dist_dir, "assets")), name="assets")
+    
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        if full_path.startswith("api/"):
+            raise HTTPException(status_code=404, detail="API Route Not Found")
+        target_path = os.path.join(dist_dir, full_path)
+        if os.path.isfile(target_path):
+            return FileResponse(target_path)
+        return FileResponse(os.path.join(dist_dir, "index.html"))
 
 
 # ---------------------------------------------------------------------------

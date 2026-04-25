@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: deeptrace-production
+    env: docker
+    plan: free
+    region: ohio
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: GEMINI_API_KEY
+        sync: false # Requires manual assignment in Render dashboard
