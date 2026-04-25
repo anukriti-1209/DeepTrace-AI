@@ -18,7 +18,7 @@ import {
   LineChart, Line, XAxis, YAxis
 } from 'recharts'
 
-const API = 'http://localhost:8000'  // Hardcoded for local deployment instead of using Vite proxy
+const API = import.meta.env.PROD ? '' : 'http://localhost:8000'
 
 /* ═══════════════════════════════════════════════════════════════════════
    DeepTrace Dashboard — 4 Screens
