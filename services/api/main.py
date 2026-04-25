@@ -617,7 +617,7 @@ async def simulate_detection_agents(db: Session = Depends(get_db)):
 # ---------------------------------------------------------------------------
 # Static Web Bundle Resolution (Docker / Render)
 # ---------------------------------------------------------------------------
-dist_dir = os.path.join(os.path.dirname(__file__), "../../../frontend/dist")
+dist_dir = os.path.join(os.path.dirname(__file__), "../../frontend/dist")
 if os.path.isdir(dist_dir):
     app.mount("/assets", StaticFiles(directory=os.path.join(dist_dir, "assets")), name="assets")
     
