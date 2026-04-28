@@ -38,8 +38,13 @@ def encode_watermark(
     if conf > 0.8:
         raise ValueError(f"Image already contains a DeepTrace watermark (Fingerprint: {extracted_fp[:8]}...). Double-watermarking rejected.")
 
-    # 2. Prepare image
+    # 2. Prepare image & optimize for memory limits
     img = Image.open(io.BytesIO(image_data)).convert("RGB")
+    
+    # Crucial Fix: Render Free Limits RAM to 512MB. 
+    # DWT memory scale goes quadratic, so we aggressively throttle the image matrix size.
+    img.thumbnail((720, 720), Image.Resampling.LANCZOS)
+    
     bgr = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 
     wm_bytes = bytes.fromhex(fingerprint)
@@ -85,6 +90,7 @@ def decode_watermark(
     Extract 64-bit watermark via DWT-DCT inverse.
     """
     img = Image.open(io.BytesIO(image_data)).convert("RGB")
+    img.thumbnail((720, 720), Image.Resampling.LANCZOS)
     bgr = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 
     decoder = WatermarkDecoder('bytes', PAYLOAD_BYTES * 8)

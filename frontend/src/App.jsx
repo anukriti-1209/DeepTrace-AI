@@ -342,7 +342,9 @@ function LiveFeed() {
 
     // WebSocket connection
     const proto = window.location.protocol === 'https:' ? 'wss' : 'ws'
-    const wsUrl = `${proto}://localhost:8000/ws/detections`
+    const wsUrl = import.meta.env.PROD 
+        ? `${proto}://${window.location.host}/ws/detections` 
+        : `${proto}://localhost:8000/ws/detections`
     try {
       const ws = new WebSocket(wsUrl)
       wsRef.current = ws
